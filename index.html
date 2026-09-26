@@ -2,130 +2,83 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>متجر فك الاحتكار</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    :root {
-      --bg-color: #0f172a;
-      --card-bg: #1e293b;
-      --accent: #38bdf8;
-      --text-main: #f8fafc;
-      --text-sub: #94a3b8;
-      --btn-bg: #0284c7;
-    }
     body {
+      background-color: #0f172a;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 0;
       padding: 16px;
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      box-sizing: border-box;
     }
     header {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      text-align: center;
       margin-bottom: 20px;
     }
     h1 {
-      font-size: 1.3rem;
+      font-size: 22px;
+      color: #38bdf8;
       margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    }
+    .status {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: 5px;
     }
     .search-box {
       width: 100%;
       box-sizing: border-box;
-      padding: 12px 16px;
-      border-radius: 12px;
+      padding: 12px;
+      border-radius: 10px;
       border: 1px solid #334155;
-      background-color: var(--card-bg);
+      background: #1e293b;
       color: #fff;
-      font-size: 0.95rem;
-      outline: none;
-    }
-    .categories {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      scrollbar-width: none;
-    }
-    .cat-badge {
-      background-color: #334155;
-      color: var(--text-sub);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-    .cat-badge.active {
-      background-color: var(--accent);
-      color: #0f172a;
-      font-weight: bold;
-    }
-    .app-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
+      font-size: 14px;
+      margin-bottom: 16px;
     }
     .app-card {
-      background-color: var(--card-bg);
-      border-radius: 16px;
-      padding: 14px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
-    }
-    .app-icon {
-      width: 55px;
-      height: 55px;
+      background: #1e293b;
       border-radius: 12px;
-      background: linear-gradient(135deg, #0284c7, #38bdf8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.6rem;
-      flex-shrink: 0;
+      padding: 14px;
+      margin-bottom: 12px;
+      border: 1px solid #334155;
     }
-    .app-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .app-title {
-      margin: 0 0 4px;
-      font-size: 1rem;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .app-meta {
-      font-size: 0.8rem;
-      color: var(--text-sub);
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    .dl-btn {
-      background-color: var(--btn-bg);
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 0.85rem;
+    .app-name {
+      font-size: 16px;
       font-weight: bold;
-      cursor: pointer;
-      flex-shrink: 0;
+      color: #f8fafc;
     }
-    .loader {
+    .app-category {
+      display: inline-block;
+      background: #0284c7;
+      color: #fff;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin: 6px 0;
+    }
+    .app-desc {
+      font-size: 13px;
+      color: #cbd5e1;
+      margin-bottom: 10px;
+    }
+    .btn-action {
+      background: #38bdf8;
+      color: #0f172a;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .empty-state {
       text-align: center;
-      padding: 40px;
-      color: var(--text-sub);
+      padding: 40px 10px;
+      color: #94a3b8;
     }
   </style>
 </head>
@@ -133,14 +86,12 @@
 
   <header>
     <h1>🛍️ متجر فك الاحتكار</h1>
-    <input type="text" id="search" class="search-box" placeholder="ابحث عن تطبيق...">
-    <div class="categories" id="cats-container">
-      <div class="cat-badge active" onclick="filterCat('all')">الكل</div>
-    </div>
+    <div class="status" id="status-text">جاري جلب التطبيقات...</div>
   </header>
 
-  <div id="loader" class="loader">جاري تحميل التطبيقات المعتمدة...</div>
-  <div class="app-grid" id="apps-container"></div>
+  <input type="text" id="search-input" class="search-box" placeholder="🔍 ابحث عن تطبيق..." onkeyup="filterApps()">
+
+  <div id="apps-container"></div>
 
   <script>
     const tg = window.Telegram?.WebApp;
@@ -149,82 +100,83 @@
       tg.ready();
     }
 
-    const FIREBASE_URL = "https://telegram-appstore-8cac3-default-rtdb.firebaseio.com/apps.json";
     let allApps = [];
-    let currentCat = 'all';
 
     async function loadApps() {
-      try {
-        const res = await fetch(FIREBASE_URL);
-        const data = await res.json();
-        document.getElementById('loader').style.display = 'none';
-
-        if (!data) return;
-
-        allApps = Object.entries(data)
-          .filter(([_, app]) => app.status === 'approved')
-          .map(([id, app]) => ({ id, ...app }));
-
-        buildCategories();
-        renderApps();
-      } catch (err) {
-        document.getElementById('loader').innerText = "حدث خطأ أثناء تحميل البيانات.";
-      }
-    }
-
-    function buildCategories() {
-      const cats = ['الكل', ...new Set(allApps.map(a => a.category).filter(Boolean))];
-      const container = document.getElementById('cats-container');
-      container.innerHTML = cats.map(c => `
-        <div class="cat-badge ${c === 'الكل' ? 'active' : ''}" onclick="filterCat('${c}')">${c}</div>
-      `).join('');
-    }
-
-    function filterCat(cat) {
-      currentCat = cat;
-      document.querySelectorAll('.cat-badge').forEach(el => {
-        el.classList.toggle('active', el.innerText === cat);
-      });
-      renderApps();
-    }
-
-    function renderApps() {
-      const q = document.getElementById('search').value.toLowerCase();
+      const status = document.getElementById('status-text');
       const container = document.getElementById('apps-container');
 
-      const filtered = allApps.filter(app => {
-        const matchCat = (currentCat === 'الكل' || app.category === currentCat);
-        const matchSearch = app.name.toLowerCase().includes(q) || (app.description && app.description.toLowerCase().includes(q));
-        return matchCat && matchSearch;
-      });
+      try {
+        const res = await fetch('https://telegram-appstore-8cac3-default-rtdb.firebaseio.com/apps.json');
+        const data = await res.json();
 
-      if (!filtered.length) {
-        container.innerHTML = '<div class="loader">لا توجد تطبيقات متوفرة.</div>';
-        return;
+        if (!data || Object.keys(data).length === 0) {
+          status.innerText = "المتجر متصل";
+          container.innerHTML = `
+            <div class="empty-state">
+              <h3>لا توجد تطبيقات معروضة بعد! 📦</h3>
+              <p>قم برفع تطبيق من بوت المطورين واعتماده من الإدارة ليظهر هنا فوراً.</p>
+            </div>`;
+          return;
+        }
+
+        allApps = Object.entries(data)
+          .filter(([id, app]) => app && app.status === 'approved')
+          .map(([id, app]) => ({ id, ...app }));
+
+        if (allApps.length === 0) {
+          status.innerText = "المتجر متصل";
+          container.innerHTML = `
+            <div class="empty-state">
+              <h3>بانتظار موافقة الإدارة ⏳</h3>
+              <p>تم استلام التطبيقات وهي قيد المراجعة في بوت الإدارة.</p>
+            </div>`;
+        } else {
+          status.innerText = `عدد التطبيقات المتاحة: ${allApps.length}`;
+          renderApps(allApps);
+        }
+
+      } catch (err) {
+        status.innerText = "تعذر الاتصال بقاعدة البيانات";
+        container.innerHTML = `<div class="empty-state">⚠️ حدث خطأ في جلب البيانات</div>`;
       }
+    }
 
-      container.innerHTML = filtered.map(app => `
-        <div class="app-card">
-          <div class="app-icon">📱</div>
-          <div class="app-info">
-            <h3 class="app-title">${app.name}</h3>
-            <div class="app-meta">
-              <span>📁 ${app.category || 'أدوات'}</span>
-              <span>⭐ ${app.ratings && app.ratings.count ? (app.ratings.sum / app.ratings.count).toFixed(1) : 'جديد'}</span>
-            </div>
-          </div>
-          <button class="dl-btn" onclick="openApp('${app.id}')">عرض</button>
-        </div>
-      `).join('');
+    function renderApps(apps) {
+      const container = document.getElementById('apps-container');
+      container.innerHTML = '';
+
+      apps.forEach(app => {
+        const card = document.createElement('div');
+        card.className = 'app-card';
+        card.innerHTML = `
+          <div class="app-name">${app.name}</div>
+          <span class="app-category">${app.category || 'عام'}</span>
+          <div class="app-desc">${app.description || 'لا يوجد وصف متاح'}</div>
+          <button class="btn-action" onclick="openApp('${app.id}')">تنزيل وتفاصيل 📥</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterApps() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const filtered = allApps.filter(app => 
+        (app.name && app.name.toLowerCase().includes(query)) ||
+        (app.category && app.category.toLowerCase().includes(query))
+      );
+      renderApps(filtered);
     }
 
     function openApp(appId) {
       if (tg) {
         tg.sendData(JSON.stringify({ action: "view", app_id: appId }));
+        tg.close();
+      } else {
+        alert("يتم الفتح داخل تيليجرام فقط");
       }
     }
 
-    document.getElementById('search').addEventListener('input', renderApps);
     loadApps();
   </script>
 </body>
